@@ -21,7 +21,7 @@ public class LaunchPage {
     @FXML
     private TextField regexInput;
     @FXML
-    private Label expectedIters, expectedPctEffort, expectedTimeRemaining, numIters, warnText, timeElapsed,
+    private Label expectedIters, expectedPctEffort, expectedTimeRemaining, numIters, warnText, timeElapsed, version,
             numGenThreads, numValThreads, addressesPerSecond, status, address, seed, mnemonic, qDepth, postAddressGen;
     @FXML
     private Button start, addWorkerThread, removeWorkerThread, copyMnemonic, copyAddress, copyDonationAddress;
@@ -34,6 +34,7 @@ public class LaunchPage {
     public LaunchPage(){}
     @FXML
     private void initialize() {
+        version.setText("Version "+Utils.VERSION);
         addWorkerThread.setOnAction(e -> {
             if(inst != null){
                 inst.increaseGenThreads();

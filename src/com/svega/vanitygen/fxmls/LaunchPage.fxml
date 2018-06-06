@@ -44,5 +44,6 @@
       <Button fx:id="copyMnemonic" layoutX="958.0" layoutY="399.0" mnemonicParsing="false" text="Copy mnemonic" />
       <Button fx:id="copyAddress" layoutX="1146.0" layoutY="399.0" mnemonicParsing="false" text="Copy address" />
       <Button fx:id="copyDonationAddress" layoutX="958.0" layoutY="440.0" mnemonicParsing="false" text="Copy donation address" />
+      <Label fx:id="version" layoutX="1146.0" layoutY="14.0" text="Version" />
    </children>
 </AnchorPane>
