@@ -11,13 +11,13 @@ import javax.swing.*;
 import java.io.InputStream;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class MoneroVanityGen extends Application {
+public class MoneroVanityGenMain extends Application {
 
     public static void main(String[] args) {
         if(args.length == 0)
             launch(args);
         else
-            VanityGenMainKt.main(args);
+            VanityGenKt.main(args);
     }
 
     public static LinkedBlockingQueue<Runnable> q = new LinkedBlockingQueue<>();
@@ -37,7 +37,7 @@ public class MoneroVanityGen extends Application {
 
         Scene scene = new Scene(root, 1280, 480);
 
-        stage.setTitle("FXML Welcome");
+        stage.setTitle("Monero Vanity Address Generator");
         stage.setScene(scene);
         stage.show();
     }

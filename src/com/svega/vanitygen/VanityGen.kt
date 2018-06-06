@@ -334,6 +334,7 @@ class VanityGenState(private val lp: LaunchPage,
         increaseGenThreads()
         increaseValidationThreads()
         lp.update(LaunchPage.UpdateItem.STATUS, "Working...")
+        lp.update(LaunchPage.UpdateItem.POST_GEN, "")
     }
     fun increaseGenThreads(){
         val run = Thread(Runnable {
@@ -390,7 +391,7 @@ class VanityGenState(private val lp: LaunchPage,
                 val address = VanityGenMain.createFullAddress(pair.second.asUInt8Array())
                 println("Address is $address")
                 onDoneCallback.call(Pair(address, seed))
-                lp.update(LaunchPage.UpdateItem.POST_GEN, "If this helped you, please consider donating to")
+                lp.update(LaunchPage.UpdateItem.POST_GEN, "If this helped you, please consider donating!")
                 lp.update(LaunchPage.UpdateItem.MNEMONIC, GenMnemonic.getMnemonic(seed))
             }
         })
