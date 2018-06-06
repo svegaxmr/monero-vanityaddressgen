@@ -337,16 +337,14 @@ class VanityGenState(private val lp: LaunchPage,
     }
     fun increaseGenThreads(){
         val run = Thread(Runnable {
-            try{
-                val sr = SecureRandom()
-                val seed = sr.generateSeed(32)
-                while(!done){
-                    q.add(Pair(createHalfAddressString(seed.asUInt8Array()), Arrays.copyOf(seed, seed.size)))
-                    System.arraycopy(seed, 1, seed, 0, 31)
-                    seed[31] = sr.nextInt().toByte()
-                }
-                Thread.sleep(0)
-            }catch (_: InterruptedException){}
+            val sr = SecureRandom()
+            val seed = sr.generateSeed(32)
+            while(!done){
+                q.add(Pair(createHalfAddressString(seed.asUInt8Array()), Arrays.copyOf(seed, seed.size)))
+                System.arraycopy(seed, 1, seed, 0, 31)
+                seed[31] = sr.nextInt().toByte()
+            }
+            Thread.sleep(0)
         })
         run.name = "Generator Thread $genNumber"
         run.start()
@@ -404,7 +402,7 @@ class VanityGenState(private val lp: LaunchPage,
     }
     fun decreaseGenThreads(){
         if(generatorThreads.size != 1) {
-            generatorThreads[generatorThreads.size - 1].interrupt()
+            generatorThreads[generatorThreads.size - 1].stop()
             generatorThreads.removeAt(generatorThreads.size - 1)
         }
         lp.update(LaunchPage.UpdateItem.GEN_THREADS, generatorThreads.size)

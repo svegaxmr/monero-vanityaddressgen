@@ -7,13 +7,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="032f7aff-7ec9-48f4-817b-37a9fbc6596e" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/com/svega/vanitygen/GenMnemonic.kt" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/com/svega/vanitygen/WordList.kt" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/src/com/svega/vanitygen/MoneroVanityGen.java" afterPath="$PROJECT_DIR$/src/com/svega/vanitygen/MoneroVanityGen.java" />
       <change beforePath="$PROJECT_DIR$/src/com/svega/vanitygen/VanityGenMain.kt" afterPath="$PROJECT_DIR$/src/com/svega/vanitygen/VanityGenMain.kt" />
-      <change beforePath="$PROJECT_DIR$/src/com/svega/vanitygen/fxmls/LaunchPage.fxml" afterPath="$PROJECT_DIR$/src/com/svega/vanitygen/fxmls/LaunchPage.fxml" />
-      <change beforePath="$PROJECT_DIR$/src/com/svega/vanitygen/fxmls/LaunchPage.java" afterPath="$PROJECT_DIR$/src/com/svega/vanitygen/fxmls/LaunchPage.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -33,8 +27,8 @@
       <file leaf-file-name="VanityGenMain.kt" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/svega/vanitygen/VanityGenMain.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="336">
-              <caret line="347" column="30" lean-forward="false" selection-start-line="347" selection-start-column="30" selection-end-line="347" selection-end-column="30" />
+            <state relative-caret-position="399">
+              <caret line="347" column="10" lean-forward="true" selection-start-line="347" selection-start-column="10" selection-end-line="347" selection-end-column="10" />
               <folding>
                 <element signature="e#29#528#0" expanded="true" />
               </folding>
@@ -431,7 +425,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32984293" sideWeight="0.50208336" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32984293" sideWeight="0.49791667" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32984293" sideWeight="0.49791667" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -627,8 +621,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/svega/vanitygen/VanityGenMain.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="347" column="30" lean-forward="false" selection-start-line="347" selection-start-column="30" selection-end-line="347" selection-end-column="30" />
+        <state relative-caret-position="399">
+          <caret line="347" column="10" lean-forward="true" selection-start-line="347" selection-start-column="10" selection-end-line="347" selection-end-column="10" />
           <folding>
             <element signature="e#29#528#0" expanded="true" />
           </folding>
