@@ -9,7 +9,6 @@ import javafx.stage.Stage;
 
 import javax.swing.*;
 import java.io.InputStream;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class MoneroVanityGenMain extends Application {
 
@@ -19,8 +18,6 @@ public class MoneroVanityGenMain extends Application {
         else
             VanityGenKt.main(args);
     }
-
-    public static LinkedBlockingQueue<Runnable> q = new LinkedBlockingQueue<>();
 
     @Override
     public void start(Stage stage) {

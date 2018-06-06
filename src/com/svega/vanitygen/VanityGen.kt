@@ -111,8 +111,8 @@ class VanityGenState(private val lp: LaunchPage,
     init {
         increaseGenThreads()
         increaseValidationThreads()
-        lp.update(LaunchPage.UpdateItem.STATUS, "Working...")
-        lp.update(LaunchPage.UpdateItem.POST_GEN, "")
+        lp.update(UpdateItem.STATUS, "Working...")
+        lp.update(UpdateItem.POST_GEN, "")
     }
     fun increaseGenThreads(){
         val run = Thread(Runnable {
@@ -129,7 +129,7 @@ class VanityGenState(private val lp: LaunchPage,
         run.start()
         ++genNumber
         generatorThreads.add(run)
-        lp.update(LaunchPage.UpdateItem.GEN_THREADS, generatorThreads.size)
+        lp.update(UpdateItem.GEN_THREADS, generatorThreads.size)
     }
     fun increaseValidationThreads(){
         val run = Thread(Runnable {
@@ -146,10 +146,10 @@ class VanityGenState(private val lp: LaunchPage,
                 if(generated % 10000 == 0){
                     val etime = System.nanoTime()
                     val tm = Duration.ofNanos(etime - start)
-                    lp.update(LaunchPage.UpdateItem.TIME, tm.seconds)
-                    lp.update(LaunchPage.UpdateItem.ADDRESSES_PER_SEC, (10000 / ((etime.toDouble() - stime.toDouble()) / 1e9)).toLong())
-                    lp.update(LaunchPage.UpdateItem.NUMBER_GEN, generated)
-                    lp.update(LaunchPage.UpdateItem.QDEPTH, q.size)
+                    lp.update(UpdateItem.TIME, tm.seconds)
+                    lp.update(UpdateItem.ADDRESSES_PER_SEC, (10000 / ((etime.toDouble() - stime.toDouble()) / 1e9)).toLong())
+                    lp.update(UpdateItem.NUMBER_GEN, generated)
+                    lp.update(UpdateItem.QDEPTH, q.size)
                     stime = etime
                 }
             }
@@ -157,29 +157,29 @@ class VanityGenState(private val lp: LaunchPage,
                 done = true
                 val end = System.nanoTime()
                 val tm = Duration.ofNanos(end - start)
-                lp.update(LaunchPage.UpdateItem.TIME, tm.seconds)
-                lp.update(LaunchPage.UpdateItem.ADDRESSES_PER_SEC, (generated / ((end.toDouble() - start.toDouble()) / 1e9)).toLong())
-                lp.update(LaunchPage.UpdateItem.NUMBER_GEN, generated)
-                lp.update(LaunchPage.UpdateItem.STATUS, "Done!")
+                lp.update(UpdateItem.TIME, tm.seconds)
+                lp.update(UpdateItem.ADDRESSES_PER_SEC, (generated / ((end.toDouble() - start.toDouble()) / 1e9)).toLong())
+                lp.update(UpdateItem.NUMBER_GEN, generated)
+                lp.update(UpdateItem.STATUS, "Done!")
                 val seed = BinHexUtils.binaryToHex(pair.second)
                 val address = VanityGenMain.createFullAddress(pair.second.asUInt8Array())
                 onDoneCallback.call(Pair(address, seed))
-                lp.update(LaunchPage.UpdateItem.POST_GEN, "If this helped you, please consider donating!")
-                lp.update(LaunchPage.UpdateItem.MNEMONIC, GenMnemonic.getMnemonic(seed))
+                lp.update(UpdateItem.POST_GEN, "If this helped you, please consider donating!")
+                lp.update(UpdateItem.MNEMONIC, GenMnemonic.getMnemonic(seed))
             }
         })
         run.name = "Validation Thread $valNumber"
         run.start()
         ++valNumber
         validationThreads.add(run)
-        lp.update(LaunchPage.UpdateItem.VAL_THREADS, validationThreads.size)
+        lp.update(UpdateItem.VAL_THREADS, validationThreads.size)
     }
     fun decreaseGenThreads(){
         if(generatorThreads.size != 1) {
             generatorThreads[generatorThreads.size - 1].stop()
             generatorThreads.removeAt(generatorThreads.size - 1)
         }
-        lp.update(LaunchPage.UpdateItem.GEN_THREADS, generatorThreads.size)
+        lp.update(UpdateItem.GEN_THREADS, generatorThreads.size)
     }
     fun stop(){
         done = true

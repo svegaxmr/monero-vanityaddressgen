@@ -1,9 +1,6 @@
 package com.svega.vanitygen.fxmls;
 
-import com.svega.vanitygen.Base58;
-import com.svega.vanitygen.Utils;
-import com.svega.vanitygen.VanityGenMain;
-import com.svega.vanitygen.VanityGenState;
+import com.svega.vanitygen.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -17,7 +14,7 @@ import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 
-public class LaunchPage {
+public class LaunchPage implements ProgressUpdatable {
     @FXML
     private TextField regexInput;
     @FXML
@@ -139,6 +136,7 @@ public class LaunchPage {
         if(inst != null)
             inst.stop();
     }
+    @Override
     public void update(UpdateItem item, Object in){
         Platform.runLater(new Runnable() {
             @Override
@@ -198,20 +196,5 @@ public class LaunchPage {
                 }
             }
         });
-    }
-    public enum UpdateItem{
-        TIME,
-        NUMBER_GEN,
-        VAL_THREADS,
-        GEN_THREADS,
-        WARN_TEXT,
-        ADDRESS,
-        SEED,
-        MNEMONIC,
-        ADDRESSES_PER_SEC,
-        STATUS,
-        COMPLEXITY,
-        QDEPTH,
-        POST_GEN
     }
 }
