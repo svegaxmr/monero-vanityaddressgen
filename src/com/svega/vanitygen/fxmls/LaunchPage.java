@@ -12,6 +12,9 @@ import javafx.scene.control.TextField;
 import kotlin.Unit;
 import kotlin.text.Regex;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.ByteArrayInputStream;
 import java.text.DecimalFormat;
 import java.time.Duration;
@@ -22,13 +25,14 @@ public class LaunchPage {
     private TextField regexInput;
     @FXML
     private Label expectedIters, expectedPctEffort, expectedTimeRemaining, numIters, warnText, timeElapsed,
-            numGenThreads, numValThreads, addressesPerSecond, status, address, seed, mnemonic, qDepth;
+            numGenThreads, numValThreads, addressesPerSecond, status, address, seed, mnemonic, qDepth, postAddressGen;
     @FXML
-    private Button start, addWorkerThread, removeWorkerThread;
+    private Button start, addWorkerThread, removeWorkerThread, copyMnemonic;
 
     private static VanityGenState inst;
     private long complexity, elapsedSeconds, addresses;
     private int decimalPlaces = 0;
+    private String mnemonicStr;
 
     public LaunchPage(){}
     @FXML
@@ -43,6 +47,11 @@ public class LaunchPage {
             if(inst != null){
                 inst.decreaseGenThreads();
             }
+        });
+        copyMnemonic.setOnAction(e -> {//mnemonicStr
+            StringSelection selection = new StringSelection(mnemonicStr);
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(selection, selection);
         });
     }
     @FXML
@@ -165,10 +174,14 @@ public class LaunchPage {
                         expectedIters.setText("Expected number of iterations to make: "+in);
                         break;
                     case MNEMONIC:
+                        mnemonicStr = (String)in;
                         mnemonic.setText("Mnemonic is: "+in);
                         break;
                     case QDEPTH:
                         qDepth.setText("Queue depth: "+in);
+                        break;
+                    case POST_GEN:
+                        postAddressGen.setText((String)in);
                         break;
                 }
             }
@@ -186,6 +199,7 @@ public class LaunchPage {
         ADDRESSES_PER_SEC,
         STATUS,
         COMPLEXITY,
-        QDEPTH
+        QDEPTH,
+        POST_GEN
     }
 }

@@ -345,6 +345,7 @@ class VanityGenState(private val lp: LaunchPage,
                     System.arraycopy(seed, 1, seed, 0, 31)
                     seed[31] = sr.nextInt().toByte()
                 }
+                Thread.sleep(0)
             }catch (_: InterruptedException){}
         })
         run.name = "Generator Thread $genNumber"
@@ -391,6 +392,8 @@ class VanityGenState(private val lp: LaunchPage,
                 val address = VanityGenMain.createFullAddress(pair.second.asUInt8Array())
                 println("Address is $address")
                 onDoneCallback.call(Pair(address, seed))
+                lp.update(LaunchPage.UpdateItem.POST_GEN, "If this helped you, please consider donating to")
+                lp.update(LaunchPage.UpdateItem.MNEMONIC, GenMnemonic.getMnemonic(seed))
             }
         })
         run.name = "Validation Thread $valNumber"

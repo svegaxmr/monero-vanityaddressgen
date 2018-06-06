@@ -35,7 +35,7 @@ public class MoneroVanityGen extends Application {
             System.exit(-1);
         }
 
-        Scene scene = new Scene(root, 900, 480);
+        Scene scene = new Scene(root, 1280, 480);
 
         stage.setTitle("FXML Welcome");
         stage.setScene(scene);

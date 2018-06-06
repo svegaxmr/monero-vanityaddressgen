@@ -6,14 +6,14 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="480.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.svega.vanitygen.fxmls.LaunchPage">
+<AnchorPane prefHeight="480.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.svega.vanitygen.fxmls.LaunchPage">
    <children>
-      <TextField fx:id="regexInput" layoutX="14.0" layoutY="32.0" prefHeight="36.0" prefWidth="880.0" />
+      <TextField fx:id="regexInput" layoutX="14.0" layoutY="32.0" prefHeight="36.0" prefWidth="1260.0" />
       <Label layoutX="14.0" layoutY="14.0" text="Regex to match from second character" />
       <Label fx:id="expectedIters" layoutX="14.0" layoutY="67.0" text="Expected number of iterations to make: 0" />
       <Label fx:id="expectedPctEffort" layoutX="14.0" layoutY="157.0" text="Percentage effort based on expectations: 0%" />
       <Label fx:id="expectedTimeRemaining" layoutX="13.0" layoutY="139.0" text="Expected time remaining: 0s" />
-      <Button fx:id="start" layoutX="766.0" layoutY="440.0" mnemonicParsing="false" onAction="#onButtonClicked" style="-fx-border-radius: 3;" text="Begin matching" />
+      <Button fx:id="start" layoutX="1146.0" layoutY="440.0" mnemonicParsing="false" onAction="#onButtonClicked" style="-fx-border-radius: 3;" text="Begin matching" />
       <Label fx:id="numIters" layoutX="14.0" layoutY="85.0" text="Iterations so far: 0" />
       <Label fx:id="numGenThreads" layoutX="14.0" layoutY="195.0" text="Number of generation threads: 0" />
       <Label fx:id="numValThreads" layoutX="14.0" layoutY="213.0" text="Number of validation threads: 0" />
@@ -22,7 +22,7 @@
       <Label fx:id="warnText" layoutX="14.0" layoutY="440.0" />
       <Label fx:id="mnemonic" layoutX="14.0" layoutY="282.0" text="Mnemonic is:" />
       <Label fx:id="addressesPerSecond" layoutX="14.0" layoutY="103.0" text="Addresses generated per second: 0" />
-      <Label fx:id="status" layoutX="14.0" layoutY="318.0" text="Waiting...">
+      <Label fx:id="status" layoutX="10.0" layoutY="399.0" text="Waiting...">
          <font>
             <Font size="36.0" />
          </font>
@@ -39,5 +39,8 @@
          </font>
       </Button>
       <Label fx:id="qDepth" layoutX="13.0" layoutY="300.0" text="Queue depth: 0" />
+      <Label layoutX="10.0" layoutY="449.0" text="Donation address: " />
+      <Label fx:id="postAddressGen" layoutX="13.0" layoutY="318.0" />
+      <Button fx:id="copyMnemonic" layoutX="1007.0" layoutY="440.0" mnemonicParsing="false" text="Copy mnemonic" />
    </children>
 </AnchorPane>
