@@ -21,7 +21,6 @@ public class MoneroVanityGenMain extends Application {
     }
 
     public static LinkedBlockingQueue<Runnable> q = new LinkedBlockingQueue<>();
-    private static boolean stop = false;
 
     @Override
     public void start(Stage stage) {

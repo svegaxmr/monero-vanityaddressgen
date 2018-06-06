@@ -1,6 +1,7 @@
 package com.svega.vanitygen.fxmls;
 
 import com.svega.vanitygen.Base58;
+import com.svega.vanitygen.Utils;
 import com.svega.vanitygen.VanityGenMain;
 import com.svega.vanitygen.VanityGenState;
 import javafx.application.Platform;
@@ -12,9 +13,6 @@ import javafx.scene.control.TextField;
 import kotlin.Unit;
 import kotlin.text.Regex;
 
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.io.ByteArrayInputStream;
 import java.text.DecimalFormat;
 import java.time.Duration;
@@ -27,17 +25,16 @@ public class LaunchPage {
     private Label expectedIters, expectedPctEffort, expectedTimeRemaining, numIters, warnText, timeElapsed,
             numGenThreads, numValThreads, addressesPerSecond, status, address, seed, mnemonic, qDepth, postAddressGen;
     @FXML
-    private Button start, addWorkerThread, removeWorkerThread, copyMnemonic;
+    private Button start, addWorkerThread, removeWorkerThread, copyMnemonic, copyAddress, copyDonationAddress;
 
     private static VanityGenState inst;
     private long complexity, elapsedSeconds, addresses;
     private int decimalPlaces = 0;
-    private String mnemonicStr;
+    private String mnemonicStr, addressStr;
 
     public LaunchPage(){}
     @FXML
     private void initialize() {
-        System.out.printf("Initialized\n");
         addWorkerThread.setOnAction(e -> {
             if(inst != null){
                 inst.increaseGenThreads();
@@ -49,9 +46,13 @@ public class LaunchPage {
             }
         });
         copyMnemonic.setOnAction(e -> {//mnemonicStr
-            StringSelection selection = new StringSelection(mnemonicStr);
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clipboard.setContents(selection, selection);
+            Utils.INSTANCE.copyToClipboard(mnemonicStr);
+        });
+        copyDonationAddress.setOnAction(e -> {
+            Utils.INSTANCE.copyToClipboard("49SVega8pmD5wvb9vai2aC7xQ5vcwbgxfSGm2sEJELoDfx5quMq3b2Rgs9Ua4LfsrTek73fuiatGfEibNvAdS55HABBsJdG");
+        });
+        copyAddress.setOnAction(e -> {
+            Utils.INSTANCE.copyToClipboard(addressStr);
         });
     }
     @FXML
@@ -87,10 +88,14 @@ public class LaunchPage {
             System.out.printf("read %s\n", String.valueOf(read));
             switch (read) {
                 case '[':
+                    if(open)
+                        return 0;
                     open = true;
                     temp = "[";
                     break;
                 case ']':
+                    if(!open)
+                        return 0;
                     open = false;
                     temp += read;
                     regexes.add(new Regex(temp));
@@ -152,6 +157,7 @@ public class LaunchPage {
                         numGenThreads.setText("Number of generation threads: "+in);
                         break;
                     case ADDRESS:
+                        addressStr = (String)in;
                         address.setText("Address is: "+in);
                         break;
                     case SEED:
@@ -161,14 +167,14 @@ public class LaunchPage {
                         addressesPerSecond.setText("Addresses generated per second: "+in);
                         long aps = (long) in;
                         long expectedSecs = ((complexity - addresses) / aps) + elapsedSeconds;
-                        expectedTimeRemaining.setText("Expected to take "+inst.formatDuration(Duration.ofSeconds(expectedSecs)));
+                        expectedTimeRemaining.setText("Expected to take "+Utils.INSTANCE.formatDuration(Duration.ofSeconds(expectedSecs)));
                         break;
                     case STATUS:
                         status.setText((String)in);
                         break;
                     case TIME:
                         elapsedSeconds = (Duration.ofSeconds((long)in)).getSeconds();
-                        timeElapsed.setText("Time elapsed: "+inst.formatDuration(Duration.ofSeconds((long)in)));
+                        timeElapsed.setText("Time elapsed: "+Utils.INSTANCE.formatDuration(Duration.ofSeconds((long)in)));
                         break;
                     case COMPLEXITY:
                         expectedIters.setText("Expected number of iterations to make: "+in);
