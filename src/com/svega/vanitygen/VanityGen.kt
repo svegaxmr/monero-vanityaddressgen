@@ -20,7 +20,6 @@ object VanityGenMain{
         val spend = CryptoOps.generateKeys(seed)
         var second = Keccak.getHash(BinHexUtils.hexToByteArray(spend.secret), Parameter.KECCAK_256);
         val view = CryptoOps.generateKeys(second.asUInt8Array())
-        println("spend ${spend.public} view ${view.public}")
         val toHash = "12${spend.public}${view.public}"
         val checksum = Keccak.checksum(BinHexUtils.hexToBinary(toHash))
         return Base58.encode(toHash + BinHexUtils.binaryToHex(checksum))
@@ -94,7 +93,6 @@ object VanityGenMain{
     fun startAsGUI(lp: LaunchPage, reg: String, cb: Callback<Pair<String, String>, Unit>): VanityGenState{
         val q = LinkedBlockingQueue<Pair<String, ByteArray>>()
         val pattern = "^4$reg.*"
-        println(pattern)
         return VanityGenState(lp, q, cb, Regex(pattern))
     }
 }
@@ -186,6 +184,7 @@ class VanityGenState(private val lp: LaunchPage,
     fun stop(){
         done = true
     }
+    fun isWorking() = !done
 }
 
 fun main(args: Array<String>){

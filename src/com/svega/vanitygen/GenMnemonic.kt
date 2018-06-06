@@ -26,7 +26,6 @@ object GenMnemonic {
             sb.append(word)
             sb.append(" ")
         }
-        println(sb.toString())
         return sb.toString()
     }
 

@@ -13,7 +13,7 @@
       <Label fx:id="expectedIters" layoutX="14.0" layoutY="67.0" text="Expected number of iterations to make: 0" />
       <Label fx:id="expectedPctEffort" layoutX="14.0" layoutY="157.0" text="Percentage effort based on expectations: 0%" />
       <Label fx:id="expectedTimeRemaining" layoutX="13.0" layoutY="139.0" text="Expected time remaining: 0s" />
-      <Button fx:id="start" layoutX="1146.0" layoutY="440.0" mnemonicParsing="false" onAction="#onButtonClicked" style="-fx-border-radius: 3;" text="Begin matching" />
+      <Button fx:id="start" layoutX="1146.0" layoutY="440.0" mnemonicParsing="false" onAction="#onButtonClicked" text="Begin matching" />
       <Label fx:id="numIters" layoutX="14.0" layoutY="85.0" text="Iterations so far: 0" />
       <Label fx:id="numGenThreads" layoutX="14.0" layoutY="195.0" text="Number of generation threads: 0" />
       <Label fx:id="numValThreads" layoutX="14.0" layoutY="213.0" text="Number of validation threads: 0" />

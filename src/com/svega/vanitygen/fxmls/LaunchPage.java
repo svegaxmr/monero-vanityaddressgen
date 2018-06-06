@@ -5,7 +5,6 @@ import com.svega.vanitygen.Utils;
 import com.svega.vanitygen.VanityGenMain;
 import com.svega.vanitygen.VanityGenState;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -57,21 +56,28 @@ public class LaunchPage {
     }
     @FXML
     private void onButtonClicked(){
-        String text = regexInput.getText();
-        complexity = getComplexity(text);
-        if(complexity == 0){
-            update(UpdateItem.WARN_TEXT, "Not valid regex for a Monero address!");
+        if(inst != null && inst.isWorking()){
+            inst.stop();
+            start.setText("Begin matching");
+            status.setText("Stopped");
         }else {
-            update(UpdateItem.COMPLEXITY, new DecimalFormat("#,###").format(complexity));
-            update(UpdateItem.ADDRESS, "");
-            update(UpdateItem.SEED, "");
-            update(UpdateItem.MNEMONIC, "");
-            decimalPlaces = (int) Math.log10(complexity) / 2;
-            inst = VanityGenMain.INSTANCE.startAsGUI(this, regexInput.getText(), thing -> {
-                update(UpdateItem.ADDRESS, thing.getFirst());
-                update(UpdateItem.SEED, thing.getSecond());
-                return Unit.INSTANCE;
-            });
+            String text = regexInput.getText();
+            complexity = getComplexity(text);
+            if (complexity == 0) {
+                update(UpdateItem.WARN_TEXT, "Not valid regex for a Monero address!");
+            } else {
+                update(UpdateItem.COMPLEXITY, new DecimalFormat("#,###").format(complexity));
+                update(UpdateItem.ADDRESS, "");
+                update(UpdateItem.SEED, "");
+                update(UpdateItem.MNEMONIC, "");
+                decimalPlaces = (int) Math.log10(complexity) / 2;
+                inst = VanityGenMain.INSTANCE.startAsGUI(this, regexInput.getText(), thing -> {
+                    update(UpdateItem.ADDRESS, thing.getFirst());
+                    update(UpdateItem.SEED, thing.getSecond());
+                    return Unit.INSTANCE;
+                });
+            }
+            start.setText("Stop working");
         }
     }
 
@@ -83,9 +89,7 @@ public class LaunchPage {
         boolean open = false;
         ArrayList<Regex> regexes = new ArrayList<>();
         String temp = "";
-        System.out.println("Pre-read");
         while ((read = (char) bais.read()) != 65535) {
-            System.out.printf("read %s\n", String.valueOf(read));
             switch (read) {
                 case '[':
                     if(open)
@@ -107,7 +111,6 @@ public class LaunchPage {
                         regexes.add(new Regex(String.valueOf(read)));
             }
         }
-        System.out.println("Post-read");
         String[] validSeconds = "123456789AB".split("(?!^)");
         String[] validOthers = Base58.Companion.getAlphabetStr().split("(?!^)");
         double pass = 0;
@@ -164,6 +167,7 @@ public class LaunchPage {
                         seed.setText("Seed is: "+in);
                         break;
                     case ADDRESSES_PER_SEC:
+                        start.setText("Stop working");
                         addressesPerSecond.setText("Addresses generated per second: "+in);
                         long aps = (long) in;
                         long expectedSecs = ((complexity - addresses) / aps) + elapsedSeconds;
@@ -182,6 +186,7 @@ public class LaunchPage {
                     case MNEMONIC:
                         mnemonicStr = (String)in;
                         mnemonic.setText("Mnemonic is: "+in);
+                        start.setText("Begin matching");
                         break;
                     case QDEPTH:
                         qDepth.setText("Queue depth: "+in);
