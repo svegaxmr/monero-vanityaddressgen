@@ -1,5 +1,8 @@
 package com.svega.vanitygen
 
+import org.jetbrains.annotations.NotNull
+import javax.xml.bind.DatatypeConverter
+
 class BinHexUtils {
     companion object {
         fun hexToBinary(hex: String): Array<UInt8>{
@@ -39,29 +42,11 @@ class BinHexUtils {
             return sb.toString()
         }
 
-        fun binaryToHex(bin: Array<UInt8>) : String{
-            val out = StringBuilder()
-            for (b in bin) {
-                out.append(String.format("%02X", b.toByte()))
-            }
-            return out.toString()
-        }
+        fun binaryToHex(bin: Array<UInt8>) = DatatypeConverter.printHexBinary(bin.asByteArray())!!
 
-        fun binaryToHex(bin: ByteArray) : String{
-            val out = StringBuilder()
-            for (b in bin) {
-                out.append(String.format("%02X", b))
-            }
-            return out.toString()
-        }
+        fun binaryToHex(bin: ByteArray)  = DatatypeConverter.printHexBinary(bin)!!
 
-        fun binaryToHex(bin: List<Byte>) : String{
-            val out = StringBuilder()
-            for (b in bin) {
-                out.append(String.format("%02X", b))
-            }
-            return out.toString()
-        }
+        fun binaryToHex(bin: List<Byte>) = DatatypeConverter.printHexBinary(bin.toByteArray())!!
 
         fun stringToBinary(str: String) : Array<UInt8>{
             val bytes = str.toByteArray()
