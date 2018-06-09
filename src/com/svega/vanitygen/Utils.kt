@@ -21,5 +21,5 @@ object Utils {
                 absSeconds % 60)
         return if (seconds < 0) "-$positive" else positive
     }
-    const val VERSION = "1.0.0 stable"
+    const val VERSION = "1.1.0 alpha-1"
 }
