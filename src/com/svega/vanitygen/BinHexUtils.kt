@@ -2,42 +2,47 @@ package com.svega.vanitygen
 
 class BinHexUtils {
     companion object {
-        fun hexToBinary(hex: String): Array<UInt8>{
-            if (hex.length % 2 != 0)
-                throw MoneroException("Hex string has invalid length!")
-            if(hex.isEmpty())
-                return Array(0, {UInt8(0)})
-            val res = Array(hex.length / 2, {_ -> UInt8(0)})
-            for (i in 0 until hex.length / 2) {
-                res[i] = Integer.parseInt(hex.substring(i * 2, i * 2 + 2), 16).toUInt8()
-            }
-            return res
-        }
+        fun hexToBinary(hex: String) = hexToByteArray(hex).asUInt8Array()
 
-        fun hexToByteArray(hex: String): ByteArray{
-            if (hex.length % 2 != 0)
+        fun hexToByteArray(s: String): ByteArray {
+            val len = s.length
+
+            if (len % 2 != 0)
                 throw MoneroException("Hex string has invalid length!")
-            if(hex.isEmpty())
+            if(s.isEmpty())
                 return byteArrayOf()
-            val l = hex.length
-            val data = ByteArray(l / 2)
+
+            val out = ByteArray(len / 2)
+
             var i = 0
-            while (i < l) {
-                data[i / 2] = ((Character.digit(hex[i], 16) shl 4) + Character.digit(hex[i + 1], 16)).toByte()
+            while (i < len) {
+                val h = hexToBin(s[i])
+                val l = hexToBin(s[i + 1])
+                if (h == -1 || l == -1) {
+                    throw IllegalArgumentException(
+                            "contains illegal character for hexBinary: $s")
+                }
+
+                out[i / 2] = (h * 16 + l).toByte()
                 i += 2
             }
-            return data
+
+            return out
         }
 
-        fun convertHexToString(hex: String): String {
-            val sb = StringBuilder()
-            var i = 0
-            while (i < hex.length - 1) {
-                sb.append(Integer.parseInt(hex.substring(i, i + 2), 16).toChar())
-                i += 2
+        private fun hexToBin(ch: Char): Int {
+            if (ch in '0'..'9') {
+                return ch - '0'
             }
-            return sb.toString()
+            if (ch in 'A'..'F') {
+                return ch - 'A' + 10
+            }
+            return if (ch in 'a'..'f') {
+                ch - 'a' + 10
+            } else -1
         }
+
+        fun convertHexToString(hex: String) = String(hexToByteArray(hex))
 
         private val hexCode = "0123456789ABCDEF".toCharArray()
         private fun printHexBinary(data: ByteArray): String{
