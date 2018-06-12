@@ -22,4 +22,5 @@ object Utils {
         return if (seconds < 0) "-$positive" else positive
     }
     const val VERSION = "1.1.0 alpha-1"
+    const val DONATION_ADDRESS = "49SVega8pmD5wvb9vai2aC7xQ5vcwbgxfSGm2sEJELoDfx5quMq3b2Rgs9Ua4LfsrTek73fuiatGfEibNvAdS55HABBsJdG"
 }

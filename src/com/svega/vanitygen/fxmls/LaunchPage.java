@@ -46,7 +46,7 @@ public class LaunchPage implements ProgressUpdatable {
             Utils.INSTANCE.copyToClipboard(mnemonicStr);
         });
         copyDonationAddress.setOnAction(e -> {
-            Utils.INSTANCE.copyToClipboard("49SVega8pmD5wvb9vai2aC7xQ5vcwbgxfSGm2sEJELoDfx5quMq3b2Rgs9Ua4LfsrTek73fuiatGfEibNvAdS55HABBsJdG");
+            Utils.INSTANCE.copyToClipboard(Utils.DONATION_ADDRESS);
         });
         copyAddress.setOnAction(e -> {
             Utils.INSTANCE.copyToClipboard(addressStr);
@@ -60,7 +60,7 @@ public class LaunchPage implements ProgressUpdatable {
             status.setText("Stopped");
         }else {
             String text = regexInput.getText();
-            complexity = getComplexity(text);
+            complexity = MoneroVanityGenMain.getComplexity(text);
             if (complexity == 0) {
                 update(UpdateItem.WARN_TEXT, "Not valid regex for a Monero address!");
             } else {
@@ -77,59 +77,6 @@ public class LaunchPage implements ProgressUpdatable {
             }
             start.setText("Stop working");
         }
-    }
-
-    private long getComplexity(String text) {
-        if(text.isEmpty())
-            return 1;
-        ByteArrayInputStream bais = new ByteArrayInputStream(text.getBytes());
-        char read;
-        boolean open = false;
-        ArrayList<Regex> regexes = new ArrayList<>();
-        String temp = "";
-        while ((read = (char) bais.read()) != 65535) {
-            switch (read) {
-                case '[':
-                    if(open)
-                        return 0;
-                    open = true;
-                    temp = "[";
-                    break;
-                case ']':
-                    if(!open)
-                        return 0;
-                    open = false;
-                    temp += read;
-                    regexes.add(new Regex(temp));
-                    break;
-                default:
-                    if (open)
-                        temp += read;
-                    else
-                        regexes.add(new Regex(String.valueOf(read)));
-            }
-        }
-        String[] validSeconds = "123456789AB".split("(?!^)");
-        String[] validOthers = Base58.Companion.getAlphabetStr().split("(?!^)");
-        double pass = 0;
-        for (String s : validSeconds) {
-            if (regexes.get(0).matches(s))
-                ++pass;
-        }
-        if(pass == 0)
-            return 0;
-        double diff = validSeconds.length / pass;
-        for (Regex r : regexes.subList(1, regexes.size())){
-            pass = 0;
-            for (String s : validOthers) {
-                if (r.matches(s))
-                    ++pass;
-            }
-            if(pass == 0)
-                return 0;
-            diff *= (validOthers.length / pass);
-        }
-        return (long)diff;
     }
 
     public static void stopAll(){

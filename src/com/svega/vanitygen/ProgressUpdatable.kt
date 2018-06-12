@@ -18,5 +18,6 @@ enum class UpdateItem {
     STATUS,
     COMPLEXITY,
     QDEPTH,
-    POST_GEN
+    POST_GEN,
+    SELF
 }

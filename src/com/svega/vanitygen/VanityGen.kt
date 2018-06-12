@@ -1,8 +1,8 @@
 package com.svega.vanitygen
 
 import com.svega.vanitygen.VanityGenMain.createHalfAddressString
-import com.svega.vanitygen.fxmls.LaunchPage
 import javafx.util.Callback
+import java.awt.event.ActionListener
 import java.security.SecureRandom
 import java.time.Duration
 import java.util.*
@@ -18,88 +18,39 @@ object VanityGenMain{
 
     fun createFullAddress(seed: Array<UInt8>): String{
         val spend = CryptoOps.generateKeys(seed)
-        var second = Keccak.getHash(BinHexUtils.hexToByteArray(spend.secret), Parameter.KECCAK_256);
+        val second = Keccak.getHash(BinHexUtils.hexToByteArray(spend.secret), Parameter.KECCAK_256)
         val view = CryptoOps.generateKeys(second.asUInt8Array())
         val toHash = "12${spend.public}${view.public}"
         val checksum = Keccak.checksum(BinHexUtils.hexToBinary(toHash))
         return Base58.encode(toHash + BinHexUtils.binaryToHex(checksum))
     }
 
-    fun genVanityAddress(regex: Regex){
-        val start = System.nanoTime()
-
+    fun cliVanityAddress(regex: String, scanner: Scanner?){
+        val complexity = MoneroVanityGenMain.getComplexity(regex)
         val q = LinkedBlockingQueue<Pair<String, ByteArray>>()
-        var done = false
-
-        val TRACE_AMOUNT = 100000
-
-        var a = 0
-        Thread(Runnable {
-            var pair = q.poll(1000, TimeUnit.MILLISECONDS)
-            var match = pair.first
-            var result = regex.matches(match)
-            var stime = System.nanoTime()
-            while(!result){
-                ++a
-                if(a % TRACE_AMOUNT == 0){
-                    val etime = System.nanoTime()
-                    println("Generated $a so far, took ${(etime.toDouble() - stime.toDouble()) / 1e9} seconds" +
-                            " (${TRACE_AMOUNT / ((etime.toDouble() - stime.toDouble()) / 1e9)} addresses per second)")
-                    stime = etime
-                    if(q.size >= 500)
-                        println("WARN: Queue depth is ${q.size}. Consider decreasing worker threads, or increasing validation threads.")
-                }
-                pair = q.poll(1000, TimeUnit.MILLISECONDS)
-                match = pair.first
-                result = regex.matches(match)
-            }
-            done = true
-            val end = System.nanoTime()
-            println("We made $a addresses in ${(end - start) / 1e9} seconds (${a / ((end.toDouble() - start.toDouble()) / 1e9)} addresses per second)")
-            val seed = BinHexUtils.binaryToHex(pair.second)
-            println("Seed for match is $seed")
-            val address = VanityGenMain.createFullAddress(pair.second.asUInt8Array())
-            println("Address is $address")
-        }).start()
-
-        Thread(Runnable {
-            val sr = SecureRandom()
-            val seed = sr.generateSeed(32)
-            while(!done){
-                q.add(Pair(createHalfAddressString(seed.asUInt8Array()), Arrays.copyOf(seed, seed.size)))
-                System.arraycopy(seed, 1, seed, 0, 31)
-                seed[31] = sr.nextInt().toByte()
-            }
-        }).start()
-
-        Thread(Runnable {
-            val sr = SecureRandom()
-            val seed = sr.generateSeed(32)
-            while(!done){
-                q.add(Pair(createHalfAddressString(seed.asUInt8Array()), Arrays.copyOf(seed, seed.size)))
-                System.arraycopy(seed, 1, seed, 0, 31)
-                seed[31] = sr.nextInt().toByte()
-            }
-        }).start()
-
-        val sr = SecureRandom()
-        val seed = sr.generateSeed(32)
-        while(!done){
-            q.add(Pair(createHalfAddressString(seed.asUInt8Array()), Arrays.copyOf(seed, seed.size)))
-            System.arraycopy(seed, 1, seed, 0, 31)
-            seed[31] = sr.nextInt().toByte()
+        val cb = Callback<Triple<String, String, String>, Unit>{
+            println("Address is ${it.first}")
+            println("Seed is ${it.second}")
+            println("Mnemonic is ${it.third}")
+            println("If this helped you, please consider donation to ${Utils.DONATION_ADDRESS}")
+        }
+        val clh = CLIHandler(scanner)
+        clh.update(UpdateItem.COMPLEXITY, complexity)
+        val vgs = VanityGenState(clh, q, cb, Regex("^4$regex.*"))
+        while(vgs.isWorking()){
+            Thread.sleep(250)
         }
     }
-    fun startAsGUI(lp: LaunchPage, reg: String, cb: Callback<Pair<String, String>, Unit>): VanityGenState{
+    fun startAsGUI(lp: ProgressUpdatable, reg: String, cb: Callback<Triple<String, String, String>, Unit>): VanityGenState{
         val q = LinkedBlockingQueue<Pair<String, ByteArray>>()
         val pattern = "^4$reg.*"
         return VanityGenState(lp, q, cb, Regex(pattern))
     }
 }
 
-class VanityGenState(private val lp: LaunchPage,
+class VanityGenState(private val lp: ProgressUpdatable,
                      private val q: LinkedBlockingQueue<Pair<String, ByteArray>>,
-                     private val onDoneCallback: Callback<Pair<String, String>, Unit>,
+                     private val onDoneCallback: Callback<Triple<String, String, String>, Unit>,
                      private val regex: Regex) {
     private var done = false
     private val start = System.nanoTime()
@@ -108,11 +59,27 @@ class VanityGenState(private val lp: LaunchPage,
     private var genNumber = 0
     private var valNumber = 0
     private var generated = 0
+    private var stime = start
+    private val timer: javax.swing.Timer
+    private var lastGen = 0
     init {
         increaseGenThreads()
         increaseValidationThreads()
+        lp.update(UpdateItem.SELF, this)
         lp.update(UpdateItem.STATUS, "Working...")
         lp.update(UpdateItem.POST_GEN, "")
+        timer = javax.swing.Timer(1000, {
+            val etime = System.nanoTime()
+            val tm = Duration.ofNanos(etime - start)
+            lp.update(UpdateItem.TIME, tm.seconds)
+            lp.update(UpdateItem.ADDRESSES_PER_SEC, ((generated - lastGen) / ((etime.toDouble() - stime.toDouble()) / 1e9)).toLong())
+            lp.update(UpdateItem.NUMBER_GEN, generated)
+            lp.update(UpdateItem.QDEPTH, q.size)
+            stime = etime
+            lastGen = generated
+        })
+        timer.isRepeats = true
+        timer.start()
     }
     fun increaseGenThreads(){
         val run = Thread(Runnable {
@@ -136,22 +103,12 @@ class VanityGenState(private val lp: LaunchPage,
             var pair = q.poll(1000, TimeUnit.MILLISECONDS)
             var match = pair.first
             var result = regex.matches(match)
-            var stime = System.nanoTime()
             ++generated
             while(!result && !done){
                 pair = q.poll(1000, TimeUnit.MILLISECONDS)
                 match = pair.first
                 result = regex.matches(match)
                 ++generated
-                if(generated % 10000 == 0){
-                    val etime = System.nanoTime()
-                    val tm = Duration.ofNanos(etime - start)
-                    lp.update(UpdateItem.TIME, tm.seconds)
-                    lp.update(UpdateItem.ADDRESSES_PER_SEC, (10000 / ((etime.toDouble() - stime.toDouble()) / 1e9)).toLong())
-                    lp.update(UpdateItem.NUMBER_GEN, generated)
-                    lp.update(UpdateItem.QDEPTH, q.size)
-                    stime = etime
-                }
             }
             if(!done) {
                 done = true
@@ -163,9 +120,11 @@ class VanityGenState(private val lp: LaunchPage,
                 lp.update(UpdateItem.STATUS, "Done!")
                 val seed = BinHexUtils.binaryToHex(pair.second)
                 val address = VanityGenMain.createFullAddress(pair.second.asUInt8Array())
-                onDoneCallback.call(Pair(address, seed))
+                val mnemonic = GenMnemonic.getMnemonic(seed)
+                onDoneCallback.call(Triple(address, seed, mnemonic))
                 lp.update(UpdateItem.POST_GEN, "If this helped you, please consider donating!")
-                lp.update(UpdateItem.MNEMONIC, GenMnemonic.getMnemonic(seed))
+                lp.update(UpdateItem.MNEMONIC, mnemonic)
+                timer.stop()
             }
         })
         run.name = "Validation Thread $valNumber"
@@ -183,19 +142,7 @@ class VanityGenState(private val lp: LaunchPage,
     }
     fun stop(){
         done = true
+        timer.stop()
     }
     fun isWorking() = !done
-}
-
-fun main(args: Array<String>){
-    if(args.isEmpty()){
-        println("must have at least one arg (regex form) to match!")
-        println("this will match from seconds character, disregarding the 4 in front.")
-        System.exit(-1)
-    }
-
-
-    val pattern = "^4${args[0]}.*"
-    println(pattern)
-    VanityGenMain.genVanityAddress(Regex(pattern))
 }
