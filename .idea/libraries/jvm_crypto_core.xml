@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jvm-crypto-core">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jvm-crypto-core.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="monero-utils-core">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/monero-utils-core.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,5 +1,6 @@
 package com.svega.vanitygen
 
+import com.svega.common.utils.TimeUtils
 import java.text.DecimalFormat
 import java.time.Duration
 import java.util.*
@@ -77,12 +78,12 @@ class CLIHandler(scanner: Scanner?): ProgressUpdatable {
             UpdateItem.ADDRESSES_PER_SEC -> {
                 addressesPerSecond = "Addresses generated per second: ${data as Long}"
                 val expectedSecs = (complexity - addresses) / data + elapsedSeconds
-                expectedTimeRemaining = "Expected to take " + Utils.formatDuration(Duration.ofSeconds(expectedSecs))
+                expectedTimeRemaining = "Expected to take " + TimeUtils.formatDuration(Duration.ofSeconds(expectedSecs))
             }
             UpdateItem.STATUS -> println(data as String)
             UpdateItem.TIME -> {
                 elapsedSeconds = Duration.ofSeconds(data as Long).seconds
-                timeElapsed = "Time elapsed: " + Utils.formatDuration(Duration.ofSeconds(data))
+                timeElapsed = "Time elapsed: " + TimeUtils.formatDuration(Duration.ofSeconds(data))
             }
             UpdateItem.COMPLEXITY -> {
                 expectedIters = "Expected number of iterations to make: ${data as Long}"

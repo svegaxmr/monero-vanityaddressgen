@@ -1,5 +1,7 @@
 package com.svega.vanitygen.fxmls;
 
+import com.svega.common.utils.SystemUtils;
+import com.svega.common.utils.TimeUtils;
 import com.svega.vanitygen.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -7,12 +9,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import kotlin.Unit;
-import kotlin.text.Regex;
 
-import java.io.ByteArrayInputStream;
 import java.text.DecimalFormat;
 import java.time.Duration;
-import java.util.ArrayList;
 
 public class LaunchPage implements ProgressUpdatable {
     @FXML
@@ -31,7 +30,7 @@ public class LaunchPage implements ProgressUpdatable {
     public LaunchPage(){}
     @FXML
     private void initialize() {
-        version.setText("Version "+Utils.VERSION);
+        version.setText("Version "+Utils.INSTANCE.getVERSION_STRING());
         addWorkerThread.setOnAction(e -> {
             if(inst != null){
                 inst.increaseGenThreads();
@@ -43,13 +42,13 @@ public class LaunchPage implements ProgressUpdatable {
             }
         });
         copyMnemonic.setOnAction(e -> {//mnemonicStr
-            Utils.INSTANCE.copyToClipboard(mnemonicStr);
+            SystemUtils.INSTANCE.copyToClipboard(mnemonicStr);
         });
         copyDonationAddress.setOnAction(e -> {
-            Utils.INSTANCE.copyToClipboard(Utils.DONATION_ADDRESS);
+            SystemUtils.INSTANCE.copyToClipboard(Utils.DONATION_ADDRESS);
         });
         copyAddress.setOnAction(e -> {
-            Utils.INSTANCE.copyToClipboard(addressStr);
+            SystemUtils.INSTANCE.copyToClipboard(addressStr);
         });
     }
     @FXML
@@ -117,14 +116,14 @@ public class LaunchPage implements ProgressUpdatable {
                         addressesPerSecond.setText("Addresses generated per second: "+in);
                         long aps = (long) in;
                         long expectedSecs = ((complexity - addresses) / aps) + elapsedSeconds;
-                        expectedTimeRemaining.setText("Expected to take "+Utils.INSTANCE.formatDuration(Duration.ofSeconds(expectedSecs)));
+                        expectedTimeRemaining.setText("Expected to take "+TimeUtils.INSTANCE.formatDuration(Duration.ofSeconds(expectedSecs)));
                         break;
                     case STATUS:
                         status.setText((String)in);
                         break;
                     case TIME:
                         elapsedSeconds = (Duration.ofSeconds((long)in)).getSeconds();
-                        timeElapsed.setText("Time elapsed: "+Utils.INSTANCE.formatDuration(Duration.ofSeconds((long)in)));
+                        timeElapsed.setText("Time elapsed: "+TimeUtils.INSTANCE.formatDuration(Duration.ofSeconds((long)in)));
                         break;
                     case COMPLEXITY:
                         expectedIters.setText("Expected number of iterations to make: "+in);

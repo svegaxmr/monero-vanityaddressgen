@@ -1,5 +1,7 @@
 package com.svega.vanitygen;
 
+import com.svega.common.version.Version;
+import com.svega.moneroutils.Base58;
 import com.svega.vanitygen.fxmls.LaunchPage;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -17,11 +19,13 @@ public class MoneroVanityGenMain extends Application {
 
     public static void main(String[] args) {
         Thread.setDefaultUncaughtExceptionHandler((a, b) -> {
+            if(b instanceof ThreadDeath)
+                return;
             System.out.println("Thread "+a.getName());
             b.printStackTrace();
             File errFile = new File("err.txt");
             int cnt = 0;
-            while(errFile.exists()){
+            while(errFile.exists() && cnt < 256){
                 errFile = new File("err"+(cnt++)+".txt");
             }
             try (PrintWriter pw = new PrintWriter(new FileWriter(errFile))){
@@ -29,6 +33,12 @@ public class MoneroVanityGenMain extends Application {
                 pw.flush();
             } catch (IOException e) {}
         });
+
+        if(!Version.Companion.isVersionSupported(new com.svega.common.Version(), 0, 1)){
+            System.err.println("Common utils version is not major 0 and minor > 1!");
+            System.exit(-2);
+        }
+
         if(args.length == 0)
             launch(args);
         else {
@@ -82,7 +92,7 @@ public class MoneroVanityGenMain extends Application {
             }
         }
         String[] validSeconds = "123456789AB".split("(?!^)");
-        String[] validOthers = Base58.Companion.getAlphabetStr().split("(?!^)");
+        String[] validOthers = Base58.INSTANCE.getAlphabetStr().split("(?!^)");
         double pass = 0;
         for (String s : validSeconds) {
             if (regexes.get(0).matches(s))

@@ -7,4 +7,8 @@ module monero.vanityaddressgen {
     requires kotlin.stdlib;
     requires java.desktop;
     requires javafx.controls;
+    requires jvm.ed25519;
+    requires jvm.crypto;
+    requires svega.common.utils;
+    requires monero.utils.core;
 }

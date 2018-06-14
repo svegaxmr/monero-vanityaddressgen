@@ -1,5 +1,11 @@
 Java.gitignore
 
 out/
-.idea/workspace.xml
+lib/*.jar
+
+
 .idea/uiDesigner.xml
+
+.idea/workspace.xml
+
+err*.txt
