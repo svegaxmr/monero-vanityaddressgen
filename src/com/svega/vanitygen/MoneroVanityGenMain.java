@@ -34,9 +34,14 @@ public class MoneroVanityGenMain extends Application {
             } catch (IOException e) {}
         });
 
-        if(!Version.Companion.isVersionSupported(new com.svega.common.Version(), 0, 1)){
-            System.err.println("Common utils version is not major 0 and minor > 1!");
-            System.exit(-2);
+        try {
+            Version.Companion.requires("com.svega.common", 0, 2);
+            Version.Companion.requires("com.svega.crypto.common", 0, 1);
+            Version.Companion.requires("com.svega.crypto.ed25519", 1, 0);
+            Version.Companion.requires("com.svega.moneroutils", 0, 1);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.exit(-1);
         }
 
         if(args.length == 0)
