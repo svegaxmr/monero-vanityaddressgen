@@ -37,8 +37,8 @@ public class MoneroVanityGenMain extends Application {
         try {
             Version.Companion.requires("com.svega.common", 0, 2);
             Version.Companion.requires("com.svega.crypto.common", 0, 1);
-            Version.Companion.requires("com.svega.crypto.ed25519", 1, 0);
-            Version.Companion.requires("com.svega.moneroutils", 0, 1);
+            Version.Companion.requires("com.svega.crypto.ed25519", 1, 1);
+            Version.Companion.requires("com.svega.moneroutils", 0, 2);
         }catch (Exception e){
             e.printStackTrace();
             System.exit(-1);

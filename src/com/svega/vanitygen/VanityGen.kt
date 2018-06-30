@@ -1,14 +1,10 @@
 package com.svega.vanitygen
 
-import com.svega.common.math.*
-import com.svega.crypto.common.CryptoOps.sc_reduce32
 import com.svega.crypto.common.algos.Keccak
 import com.svega.crypto.common.algos.Parameter
-import com.svega.crypto.ed25519.ge_p3_tobytes
-import com.svega.crypto.ed25519.ge_scalarmult_base
-import com.svega.crypto.ed25519.objects.ge_p3
 import com.svega.moneroutils.Base58
 import com.svega.moneroutils.BinHexUtils
+import com.svega.moneroutils.addresses.MoneroAddress.Companion.generateKeys
 import com.svega.vanitygen.VanityGenMain.createHalfAddressString
 import javafx.util.Callback
 import java.security.SecureRandom
@@ -19,30 +15,18 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 object VanityGenMain{
-    fun generateKeys(seed: Array<UInt8>): KeyPair{
-        if (seed.size != 32)
-            throw MoneroException("Invalid input length!")
-        val sec = sc_reduce32(seed)
-        val point = ge_p3()
-        ge_scalarmult_base(point, sec.asByteArray())
-        val public = ByteArray(sec.size)
-        ge_p3_tobytes(public, point)
-        val pub = public.asUInt8Array()
-
-        return KeyPair(BinHexUtils.binaryToHex(pub), BinHexUtils.binaryToHex(sec))
-    }
-    fun createHalfAddressString(seed: Array<UInt8>): String{
-        val spend = generateKeys(seed)
-        return Base58.encode("12${spend.public}")
+    fun createHalfAddressString(seed: ByteArray): String{
+        val spend = generateKeys(seed) //view is generated from first seed round
+        return Base58.encode("12${spend.public.str}")
     }
 
-    fun createFullAddress(seed: Array<UInt8>): String{
-        val spend = generateKeys(seed)
-        val second = Keccak.getHash(BinHexUtils.hexToByteArray(spend.secret), Parameter.KECCAK_256)
-        val view = generateKeys(second.asUInt8Array())
-        val toHash = "12${spend.public}${view.public}"
-        val checksum = Keccak.checksum(BinHexUtils.hexToBinary(toHash))
-        return Base58.encode(toHash + BinHexUtils.binaryToHex(checksum))
+    fun createFullAddress(seed: ByteArray): String{
+        val spend = generateKeys(seed) //view is generated from first seed round
+        val second = Keccak.getHash(spend.secret!!.data, Parameter.KECCAK_256) //keccak256 of view gets spend
+        val view = generateKeys(second) //spend is got from generatekeys
+        val toHash = "12${spend.public.str}${view.public.str}" //get everything minus checksum
+        val checksum = Keccak.checksum(BinHexUtils.hexToBinary(toHash)) //calc checksum
+        return Base58.encode(toHash + BinHexUtils.binaryToHex(checksum)) //encode
     }
 
     fun cliVanityAddress(regex: String, scanner: Scanner?){
@@ -106,7 +90,7 @@ class VanityGenState(private val lp: ProgressUpdatable,
             val sr = SecureRandom()
             val seed = sr.generateSeed(32)
             while(!done){
-                q.add(Pair(createHalfAddressString(seed.asUInt8Array()), Arrays.copyOf(seed, seed.size)))
+                q.add(Pair(createHalfAddressString(seed), Arrays.copyOf(seed, seed.size)))
                 System.arraycopy(seed, 1, seed, 0, 31)
                 seed[31] = sr.nextInt().toByte()
             }
@@ -139,7 +123,7 @@ class VanityGenState(private val lp: ProgressUpdatable,
                 lp.update(UpdateItem.NUMBER_GEN, generated)
                 lp.update(UpdateItem.STATUS, "Done!")
                 val seed = BinHexUtils.binaryToHex(pair.second)
-                val address = VanityGenMain.createFullAddress(pair.second.asUInt8Array())
+                val address = VanityGenMain.createFullAddress(pair.second)
                 val mnemonic = GenMnemonic.getMnemonic(seed)
                 onDoneCallback.call(Triple(address, seed, mnemonic))
                 lp.update(UpdateItem.POST_GEN, "If this helped you, please consider donating!")
