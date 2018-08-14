@@ -1,7 +1,9 @@
 package com.svega.vanitygen;
 
+import com.svega.common.math.UInt8;
 import com.svega.common.version.Version;
 import com.svega.moneroutils.Base58;
+import com.svega.moneroutils.addresses.MainAddress;
 import com.svega.vanitygen.fxmls.LaunchPage;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -31,18 +33,8 @@ public class MoneroVanityGenMain extends Application {
             try (PrintWriter pw = new PrintWriter(new FileWriter(errFile))){
                 b.printStackTrace(pw);
                 pw.flush();
-            } catch (IOException e) {}
+            } catch (IOException ignored) {}
         });
-
-        try {
-            Version.Companion.requires("com.svega.common", 0, 2);
-            Version.Companion.requires("com.svega.crypto.common", 0, 1);
-            Version.Companion.requires("com.svega.crypto.ed25519", 1, 1);
-            Version.Companion.requires("com.svega.moneroutils", 0, 2);
-        }catch (Exception e){
-            e.printStackTrace();
-            System.exit(-1);
-        }
 
         if(args.length == 0)
             launch(args);
@@ -54,7 +46,7 @@ public class MoneroVanityGenMain extends Application {
                 System.out.printf("Matching %s, is this okay? (y/n): ", args[0]);
                 read = in.next().charAt(0);
                 while(!isYN(read)){
-                    System.out.printf("\nInvalid character. Proceed? (y/n): ");
+                    System.out.print("\nInvalid character. Proceed? (y/n): ");
                     read = in.next().charAt(0);
                 }
             }
@@ -78,13 +70,13 @@ public class MoneroVanityGenMain extends Application {
             switch (read) {
                 case '[':
                     if(open)
-                        return 0;
+                        return -1;
                     open = true;
                     temp = "[";
                     break;
                 case ']':
                     if(!open)
-                        return 0;
+                        return -2;
                     open = false;
                     temp += read;
                     regexes.add(new Regex(temp));
@@ -96,15 +88,13 @@ public class MoneroVanityGenMain extends Application {
                         regexes.add(new Regex(String.valueOf(read)));
             }
         }
-        String[] validSeconds = "123456789AB".split("(?!^)");
-        String[] validOthers = Base58.INSTANCE.getAlphabetStr().split("(?!^)");
         double pass = 0;
         for (String s : validSeconds) {
             if (regexes.get(0).matches(s))
                 ++pass;
         }
         if(pass == 0)
-            return 0;
+            return -3;
         double diff = validSeconds.length / pass;
         for (Regex r : regexes.subList(1, regexes.size())){
             pass = 0;
@@ -113,10 +103,58 @@ public class MoneroVanityGenMain extends Application {
                     ++pass;
             }
             if(pass == 0)
-                return 0;
+                return -4;
             diff *= (validOthers.length / pass);
         }
+        StringBuilder full = new StringBuilder("4");
+        if(!checkRecursive(regexes, full, 0)) return -5;
         return (long)diff;
+    }
+    private static String[] validSeconds = "123456789AB".split("(?!^)");
+    private static String[] validOthers = Base58.INSTANCE.getAlphabetStr().split("(?!^)");
+
+    private static boolean checkRecursive(ArrayList<Regex> regexes, StringBuilder full, int s) {
+        Regex current = regexes.get(s);
+        if(s == 0){
+            for (String sd : validSeconds) {
+                if (current.matches(sd)) {
+                    if(s == regexes.size() - 1) {
+                        boolean res2 = attemptDecode(full);
+                        if (res2)
+                            return true;
+                    }else{
+                        return checkRecursive(regexes, full.append(sd), ++s);
+                    }
+                }
+            }
+        }else{
+            for (String sd : validOthers) {
+                if (current.matches(sd)) {
+                    if(s == regexes.size() - 1) {
+                        boolean res2 = attemptDecode(full);
+                        if (res2)
+                            return true;
+                    }else{
+                        return checkRecursive(regexes, full.append(sd), ++s);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean attemptDecode(StringBuilder full) {
+        int oLen = full.length();
+        while(full.length() != 95) full.append("1");
+        try{
+            UInt8[] res = Base58.INSTANCE.decode(full.toString());
+            if(res.length != 69)
+                return false;
+        }catch (Exception e){
+            while(oLen != full.length()) full.deleteCharAt(full.length() - 1);
+            return false;
+        }
+        return true;
     }
 
     public static boolean isYN(char yn){

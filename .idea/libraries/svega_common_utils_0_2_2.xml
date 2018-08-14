@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="svega-common-utils-0.2.2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/svega-common-utils-0.2.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -60,7 +60,7 @@ public class LaunchPage implements ProgressUpdatable {
         }else {
             String text = regexInput.getText();
             complexity = MoneroVanityGenMain.getComplexity(text);
-            if (complexity == 0) {
+            if (complexity <= 0) {
                 update(UpdateItem.WARN_TEXT, "Not valid regex for a Monero address!");
             } else {
                 update(UpdateItem.COMPLEXITY, new DecimalFormat("#,###").format(complexity));
@@ -84,62 +84,59 @@ public class LaunchPage implements ProgressUpdatable {
     }
     @Override
     public void update(UpdateItem item, Object in){
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                switch(item){
-                    case NUMBER_GEN:
-                        addresses = (int)in;
-                        numIters.setText("Iterations so far: "+new DecimalFormat("#,###").format(in));
-                        double exp = 100 * ((double)addresses) / ((double)complexity);
-                        String pctEff = String.format("%1."+decimalPlaces+"f%%", exp);
-                        expectedPctEffort.setText("Percentage effort based on expectations: " + pctEff);
-                        break;
-                    case WARN_TEXT:
-                        warnText.setText((String)in);
-                        break;
-                    case VAL_THREADS:
-                        numValThreads.setText("Number of validation threads: "+in);
-                        break;
-                    case GEN_THREADS:
-                        numGenThreads.setText("Number of generation threads: "+in);
-                        break;
-                    case ADDRESS:
-                        addressStr = (String)in;
-                        address.setText("Address is: "+in);
-                        break;
-                    case SEED:
-                        seed.setText("Seed is: "+in);
-                        break;
-                    case ADDRESSES_PER_SEC:
-                        start.setText("Stop working");
-                        addressesPerSecond.setText("Addresses generated per second: "+in);
-                        long aps = (long) in;
-                        long expectedSecs = ((complexity - addresses) / aps) + elapsedSeconds;
-                        expectedTimeRemaining.setText("Expected to take "+TimeUtils.INSTANCE.formatDuration(Duration.ofSeconds(expectedSecs)));
-                        break;
-                    case STATUS:
-                        status.setText((String)in);
-                        break;
-                    case TIME:
-                        elapsedSeconds = (Duration.ofSeconds((long)in)).getSeconds();
-                        timeElapsed.setText("Time elapsed: "+TimeUtils.INSTANCE.formatDuration(Duration.ofSeconds((long)in)));
-                        break;
-                    case COMPLEXITY:
-                        expectedIters.setText("Expected number of iterations to make: "+in);
-                        break;
-                    case MNEMONIC:
-                        mnemonicStr = (String)in;
-                        mnemonic.setText("Mnemonic is: "+in);
-                        start.setText("Begin matching");
-                        break;
-                    case QDEPTH:
-                        qDepth.setText("Queue depth: "+in);
-                        break;
-                    case POST_GEN:
-                        postAddressGen.setText((String)in);
-                        break;
-                }
+        Platform.runLater(() -> {
+            switch(item){
+                case NUMBER_GEN:
+                    addresses = (int)in;
+                    numIters.setText("Iterations so far: "+new DecimalFormat("#,###").format(in));
+                    double exp = 100 * ((double)addresses) / ((double)complexity);
+                    String pctEff = String.format("%1."+decimalPlaces+"f%%", exp);
+                    expectedPctEffort.setText("Percentage effort based on expectations: " + pctEff);
+                    break;
+                case WARN_TEXT:
+                    warnText.setText((String)in);
+                    break;
+                case VAL_THREADS:
+                    numValThreads.setText("Number of validation threads: "+in);
+                    break;
+                case GEN_THREADS:
+                    numGenThreads.setText("Number of generation threads: "+in);
+                    break;
+                case ADDRESS:
+                    addressStr = (String)in;
+                    address.setText("Address is: "+in);
+                    break;
+                case SEED:
+                    seed.setText("Seed is: "+in);
+                    break;
+                case ADDRESSES_PER_SEC:
+                    start.setText("Stop working");
+                    addressesPerSecond.setText("Addresses generated per second: "+in);
+                    long aps = Math.max((long) in, 1);
+                    long expectedSecs = ((complexity - addresses) / aps) + elapsedSeconds;
+                    expectedTimeRemaining.setText("Expected to take "+TimeUtils.INSTANCE.formatDuration(Duration.ofSeconds(expectedSecs)));
+                    break;
+                case STATUS:
+                    status.setText((String)in);
+                    break;
+                case TIME:
+                    elapsedSeconds = (Duration.ofSeconds((long)in)).getSeconds();
+                    timeElapsed.setText("Time elapsed: "+TimeUtils.INSTANCE.formatDuration(Duration.ofSeconds((long)in)));
+                    break;
+                case COMPLEXITY:
+                    expectedIters.setText("Expected number of iterations to make: "+in);
+                    break;
+                case MNEMONIC:
+                    mnemonicStr = (String)in;
+                    mnemonic.setText("Mnemonic is: "+in);
+                    start.setText("Begin matching");
+                    break;
+                case QDEPTH:
+                    qDepth.setText("Queue depth: "+in);
+                    break;
+                case POST_GEN:
+                    postAddressGen.setText((String)in);
+                    break;
             }
         });
     }

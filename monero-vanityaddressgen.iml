@@ -10,7 +10,7 @@
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
     <orderEntry type="library" name="jvm-crypto-core" level="project" />
     <orderEntry type="library" name="jvm-ed25519-core" level="project" />
-    <orderEntry type="library" name="svega-common-utils-core" level="project" />
     <orderEntry type="library" name="monero-utils-core" level="project" />
+    <orderEntry type="library" name="svega-common-utils-0.2.2" level="project" />
   </component>
 </module>

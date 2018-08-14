@@ -17,19 +17,12 @@ class CLIHandler(scanner: Scanner?): ProgressUpdatable {
     private var expectedTimeRemaining = ""
     private var expectedIters = ""
     private var done = false
-        set(new){
-            println("done set")
-            for(trace in Thread.currentThread().stackTrace){
-                println(trace.toString())
-            }
-        }
     private lateinit var vgs: VanityGenState
     init{
         if(scanner != null) {
             val cThr = Thread(Runnable {
-                println("start console thread")
-                while(!done){
-                    println("wait for line")
+                Thread.sleep(250)
+                while(vgs.isWorking()){
                     val line = scanner.next()!!
                     when {
                         line.startsWith("help") -> {
@@ -48,9 +41,7 @@ class CLIHandler(scanner: Scanner?): ProgressUpdatable {
                             println(expectedIters)
                         }
                     }
-                    println("Post-when: $done")
                 }
-                println("Outside loop")
             })
             cThr.name = "CLI Console Thread"
             cThr.start()
@@ -71,10 +62,11 @@ class CLIHandler(scanner: Scanner?): ProgressUpdatable {
             UpdateItem.VAL_THREADS -> println("Increased number of validation threads to $data")
             UpdateItem.GEN_THREADS -> println("Increased number of generation threads to $data")
             UpdateItem.ADDRESS -> {
-                //addressStr = data as String
-                //address.setText("Address is: $`in`")
+                println("Address: ${data as String}")
             }
-            UpdateItem.SEED -> {}//seed.setText("Seed is: $`in`")
+            UpdateItem.SEED -> {
+                println("Seed: ${data as String}")
+            }//seed.setText("Seed is: $`in`")
             UpdateItem.ADDRESSES_PER_SEC -> {
                 addressesPerSecond = "Addresses generated per second: ${data as Long}"
                 val expectedSecs = (complexity - addresses) / data + elapsedSeconds
@@ -90,13 +82,11 @@ class CLIHandler(scanner: Scanner?): ProgressUpdatable {
                 decimalPlaces = Math.max(1, Math.log10(complexity.toDouble()).toInt() / 2)
             }
             UpdateItem.MNEMONIC -> {
-                //mnemonicStr = `in` as String
-                //mnemonic.setText("Mnemonic is: $`in`")
-                //start.setText("Begin matching")
+                println("Mnemonic: ${data as String}")
             }
-            UpdateItem.QDEPTH -> {}//qDepth.setText("Queue depth: $`in`")
             UpdateItem.POST_GEN -> done = true
             UpdateItem.SELF -> vgs = data as VanityGenState
+            UpdateItem.QDEPTH -> {}//qDepth.setText("Queue depth: $`in`")
         }
     }
 }
